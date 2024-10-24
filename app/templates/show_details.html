@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .upload-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .upload-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-container input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .upload-container button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .upload-container button:hover {
+            background-color: #45a049;
+        }
+
+        #resultBox {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            font-size: 14px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Spinner styles */
+        .spinner {
+            display: none; /* Hidden by default */
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide the Push button initially */
+        #pushButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #pushButton:hover {
+            background-color: #0056b3;
+        }
+
+        #push {
+            display: none;
+        }
+
+        #showbutton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #showbutton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'app:upload_files' %}">
+            {% csrf_token %}
+            <input type="file" id="fileInput" name="files" multiple required>
+            <button type="submit" id="showDetails">Show Details</button>
+        </form>
+        <!-- Spinner to be displayed while waiting for response -->
+        <div class="spinner" id="spinner"></div>
+    </div>
+
+    <!-- Box to show the OCR result -->
+    <div id="resultBox">
+        <!-- OCR result will appear here -->
+        {% if flight %}
+        <div>
+            <p>{{flight}}</p>
+        </div>
+        {% endif %}
+    </div>
+    <div style=" display: flex; flex-direction: column; justify-content: center; align-items: center;" id="divpush">
+        <button id="pushButton">Push</button>
+        <a href="{% url 'app:show_csv' %}" id="showbutton">Show CSV</a>
+    </div>
+    <p id="push">Pushed successfully</p>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const spinner = document.getElementById('spinner');
+        const resultBox = document.getElementById('resultBox');
+        const divpush = document.getElementById('divpush');
+        const push = document.getElementById('push');
+        const pushButton = document.getElementById('pushButton'); // Initialize pushButton correctly
+        const showbutton = document.getElementById('showbutton'); // Initialize showButton correctly
+        
+        // Show the spinner when the form is submitted
+        form.addEventListener('submit', function () {
+            spinner.style.display = 'block';  // Show the spinner
+            resultBox.style.display = 'none'; 
+            divpush.style.display = 'none';// Hide the result box while loading
+            showbutton.style.display = 'none'; // Show the Show button after content is loaded
+        });
+
+        // Simulate content loading from the backend (for demo purposes)
+        form.addEventListener('load', function () {
+            spinner.style.display = 'none';   // Hide the spinner after loading
+            resultBox.style.display = 'block'; // Show the result box with data
+            divpush.style.display = 'block'; // Show the Push button after content is loaded
+            showbutton.style.display = 'block'; // Show the Show button after content is loaded
+        });
+
+        // Push button click event
+        pushButton.addEventListener('click', function() {
+            const dataToSend = {
+                data: 1,
+            };
+
+            // Send the POST request
+            fetch('/push_json/', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' // Send CSRF token for Django protection
+                },
+                body: JSON.stringify(dataToSend) // Send flight data to the backend
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse JSON response
+            })
+            .then(data => {
+                console.log('Success:', data);
+                push.style.display = "block"; // Show success message
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle errors
+            });
+        });
+
+    </script>
+</body>
+</html>
