@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Entry Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Travel Entry Form</h2>
+        <form method="POST" action="{% url 'app:getFormData' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="iTravelEntryID">Travel Entry ID (PK)</label>
+                <input type="text" class="form-control" id="iTravelEntryID" name="iTravelEntryID" required>
+            </div>
+            <div class="form-group">
+                <label for="iEventID">Event ID</label>
+                <input type="text" class="form-control" id="iEventID" name="iEventID" required>
+            </div>
+            <div class="form-group">
+                <label for="iPlannerID">Planner ID</label>
+                <input type="text" class="form-control" id="iPlannerID" name="iPlannerID" required>
+            </div>
+            <div class="form-group">
+                <label for="iUserID">User ID</label>
+                <input type="text" class="form-control" id="iUserID" name="iUserID" required>
+            </div>
+            <div class="form-group">
+                <label for="fileUploads">Upload multiple tickets</label>
+                <input type="file" class="form-control-file" id="fileUploads" name="fileUploads" multiple required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

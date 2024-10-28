@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Interactive JSON Viewer</title>
+    <style>
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background-color: #f8f9fa; 
+        }
+        #jsonData {
+            border: 1px solid #ced4da;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: white;
+            max-width: 600px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">JSON Viewer</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'app:push_webhook' %}" id="pushWebhook">Post to Webhook</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'app:database' %}" id="pushDatabase">Push to Database</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'app:show_csv' %}" id="showData">Show Data</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'app:download_csv' %}" id="downloadFile">Download File</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% if data %}
+    <div id="jsonData">
+        <h4>JSON Data</h4>
+        <pre id="jsonOutput">{{data}}</pre>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Example JSON data
+        const jsonData =JSON.parse("{{data|escapejs}}");
+        console.log(jsonData)
+        // Display JSON data
+        document.getElementById('jsonOutput').textContent = JSON.stringify(jsonData,null, 4);
+        document.getElementById('postWebhook').addEventListener('click', function() {
+            alert('Posted to Webhook');
+        });
+       
+        document.getElementById('pushDatabase').addEventListener('click', function() {
+            alert('Pushed to Database');
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -2,52 +2,25 @@
     {
         "single_trip": {
             "flight_no": "AI 2623",
-            "departure_date": "02 Feb 2025",
+            "passenger_name": "Mr. Shaan Malani Adult",
+            "source_location": "Mumbai(T2)",
+            "departure_date": "Sun, 02 Feb 2025",
             "departure_time": "09:40 hrs",
-            "arrival_date": "02 Feb 2025",
+            "arrival_date": "Sun, 02 Feb 2025",
             "arrival_time": "11:10 hrs",
-            "arrival_location": "UDR - Maharana Pratap Airport",
+            "arrival_location": "Udaipur",
             "airline_name": "Air India"
         },
         "round_trip": {
             "flight_no": "AI 2614",
-            "departure_date": "04 Feb 2025",
+            "passenger_name": "Mr. Shaan Malani Adult",
+            "source_location": "Udaipur",
+            "departure_date": "Tue, 04 Feb 2025",
             "departure_time": "14:20 hrs",
-            "arrival_date": "04 Feb 2025",
+            "arrival_date": "Tue, 04 Feb 2025",
             "arrival_time": "15:55 hrs",
-            "arrival_location": "BOM - Chhatrapati Shivaji Maharaj International Airport (Terminal 2)",
+            "arrival_location": "Mumbai(T2)",
             "airline_name": "Air India"
-        }
-    },
-    {
-        "single_trip": {
-            "flight_no": "AC 2505",
-            "departure_date": "07/05/2018",
-            "departure_time": "03:30",
-            "arrival_date": "",
-            "arrival_time": "",
-            "arrival_location": "",
-            "airline_name": ""
-        },
-        "round_trip": {
-            "flight_no": "",
-            "departure_date": "",
-            "departure_time": "",
-            "arrival_date": "",
-            "arrival_time": "",
-            "arrival_location": "",
-            "airline_name": ""
-        }
-    },
-    {
-        "single_trip": {
-            "flight_no": "UK-513",
-            "departure_date": "03\u00adApr\u00ad2024",
-            "departure_time": "18:55",
-            "arrival_date": "03-Apr-2024",
-            "arrival_time": "20:10",
-            "arrival_location": "NORTH GOA (GOX)",
-            "airline_name": "Vistara"
         }
     }
 ]
