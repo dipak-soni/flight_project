@@ -1,4 +1,4 @@
-show databases;
-use db3;
 
-select * from ticket;
+
+use db3;
+show tables;

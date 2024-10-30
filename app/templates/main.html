@@ -9,25 +9,40 @@
         body { 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             background-color: #f8f9fa; 
+            padding: 15px; /* Extra padding for mobile view */
         }
         #jsonData {
             border: 1px solid #ced4da;
             padding: 20px;
             border-radius: 5px;
             background-color: white;
-            max-width: 600px;
-            overflow: auto;
+            max-width: 100%;
+            width: 600px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        pre {
+            white-space: pre-wrap; /* Wrap JSON data for better readability on mobile */
+            word-break: break-word;
+        }
+
+        nav{
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
         <a class="navbar-brand" href="#">JSON Viewer</a>
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'app:push_webhook' %}" id="pushWebhook">Post to Webhook</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'app:database' %}" id="pushDatabase">Push to Database</a></li>
@@ -36,6 +51,7 @@
             </ul>
         </div>
     </nav>
+
     {% if data %}
     <div id="jsonData">
         <h4>JSON Data</h4>
@@ -45,18 +61,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // Example JSON data
-        const jsonData =JSON.parse("{{data|escapejs}}");
-        console.log(jsonData)
-        // Display JSON data
-        document.getElementById('jsonOutput').textContent = JSON.stringify(jsonData,null, 4);
-        document.getElementById('postWebhook').addEventListener('click', function() {
-            alert('Posted to Webhook');
-        });
-       
-        document.getElementById('pushDatabase').addEventListener('click', function() {
-            alert('Pushed to Database');
-        });
+        // Parse and display JSON data
+        const jsonData = JSON.parse("{{data|escapejs}}");
+        console.log(jsonData);
+        document.getElementById('jsonOutput').textContent = JSON.stringify(jsonData, null, 2);
+
     </script>
     {% endif %}
 </body>

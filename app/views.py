@@ -3,7 +3,7 @@ import os
 from django.http import JsonResponse,FileResponse
 import json
 import fitz 
-from langchain_community.llms import OpenAI
+from langchain_community.llms import OpenAI,Cohere
 import requests
 import time
 from langchain_openai import OpenAI
@@ -14,7 +14,6 @@ from django.conf import settings
 from .json_to_csv import get_csv
 from .models import *
 import openai
-from langchain_anthropic import AnthropicLLM
 from dotenv import load_dotenv 
 load_dotenv()
 
@@ -33,10 +32,9 @@ def llm_response():
     # this is the global variable that will hold all the json data
     global json_data
     for file in file_paths:
-        
+        # time.sleep(10)
         # Read the file one by one
         text=save_chunks(file)
-        
         # get respones from llm in json form 
         response=get_json(text)
         try:
@@ -84,12 +82,9 @@ def get_json(text):
             }}
         }}
         Instructions:
-        1. If you do not get return ticket informations then simply exclude the "round_trip" field from json.
-        2. If flight_no in round-trip field and flight_no in single trip field is exact equal then exclude the round_trip field from json.
-        3. If the document has multiple flight ticket infomations then use first flight ticket detail to extract single_trip field and the last flight ticket detail to extract round_trip field.
-        4. If you do not find any value of a particular filed then you can place N/A in place of empty string. 
-        5. If the arrival_time in single_trip field and departure_time in round_trip field is same then exclude the round_trip field from json.
-        6. If you do not find flight_no in any field then simply exclude that field from json.
+        1. If you do not get return ticket informations then simply exclude the "round_trip" field from response.
+        2. if single_trip and round_trip are equal then exclude round_trip field.
+        3. In case of multiple flight tickets then take into consider only first and last ticket.
         Document: {text}
         
         Answer:
@@ -118,11 +113,12 @@ def save_chunks(file):
 
 
 def opanai_answer(question):
-    os.getenv("OPENAI_API_KEY")
-    llm=OpenAI()
+    # llm=Cohere()
     # llm = AnthropicLLM()
     try:
-        return llm.invoke(question)
+        llm=OpenAI()
+        response=llm.invoke(question)
+        return response
     except:
         print("open ai error occurred")
         JsonResponse({"error": "Unable to connect"}, status=500)
@@ -311,60 +307,64 @@ def push_webhook(request):
 def database(request):
     # data=[{'travel_entry_id': '123', 'event_id': 'ghgh', 'planner_id': 'gg', 'user_id': 'gg'}]
     data=form_data
-    user=User.objects.filter(travel_entry_id=data[0]['travel_entry_id'])
-    if not user:
-        user=User()
-        user.travel_entry_id=data[0]['travel_entry_id']
-        user.save()  
-    user=User.objects.get(travel_entry_id=data[0]['travel_entry_id'])
+    
+    try:
+        user=User.objects.filter(travel_entry_id=data[0]['travel_entry_id'])
+        if not user:
+            user=User()
+            user.travel_entry_id=data[0]['travel_entry_id']
+            user.save()  
+        user=User.objects.get(travel_entry_id=data[0]['travel_entry_id'])
 
-    with open('data.json', 'r') as f:
-        file_dta = json.load(f)
-    print(file_dta)
-    for x in file_dta:
-        if 'single_trip' in x:
-            # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='single')
-            # if not t:
-                ticket=Ticket()
-                ticket.travel_entry_id=user
-                ticket.event_id=data[0]['event_id']
-                ticket.planner_id=data[0]['planner_id']
-                ticket.user_id=data[0]['user_id']
-                
-                y=x['single_trip']
-                ticket.passenger_name=y['passenger_name']
-                ticket.flight_no=y['flight_no']
-                ticket.source_location=y['source_location']
-                ticket.departure_date=y['departure_date']
-                ticket.departure_time=y['departure_time']
-                ticket.arrival_date=y['arrival_date']
-                ticket.arrival_time=y['arrival_time']
-                ticket.arrival_location=y['arrival_location']
-                ticket.airline_name=y['airline_name']
-                ticket.ticket_type='single'
-                ticket.save()
-        if 'round_trip' in x:
-            # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='round')
-            # if not t:
-                ticket=Ticket()
-                ticket.travel_entry_id=user
-                ticket.event_id=data[0]['event_id']
-                ticket.planner_id=data[0]['planner_id']
-                ticket.user_id=data[0]['user_id']
-                
-                y=x['round_trip']
-                ticket.passenger_name=y['passenger_name']
-                ticket.flight_no=y['flight_no']
-                ticket.source_location=y['source_location']
-                ticket.departure_date=y['departure_date']
-                ticket.departure_time=y['departure_time']
-                ticket.arrival_date=y['arrival_date']
-                ticket.arrival_time=y['arrival_time']
-                ticket.arrival_location=y['arrival_location']
-                ticket.airline_name=y['airline_name']
-                ticket.ticket_type='round'
-                ticket.save()
-    return render(request,'main.html',context={"data":'Pushed to database successfully'})
+        with open('data.json', 'r') as f:
+            file_dta = json.load(f)
+        for x in file_dta:
+            if 'single_trip' in x:
+                # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='single')
+                # if not t:
+                    ticket=Ticket()
+                    ticket.travel_entry_id=user
+                    ticket.event_id=data[0]['event_id']
+                    ticket.planner_id=data[0]['planner_id']
+                    ticket.user_id=data[0]['user_id']
+                    
+                    y=x['single_trip']
+                    ticket.passenger_name=y['passenger_name']
+                    ticket.flight_no=y['flight_no']
+                    ticket.source_location=y['source_location']
+                    ticket.departure_date=y['departure_date']
+                    ticket.departure_time=y['departure_time']
+                    ticket.arrival_date=y['arrival_date']
+                    ticket.arrival_time=y['arrival_time']
+                    ticket.arrival_location=y['arrival_location']
+                    ticket.airline_name=y['airline_name']
+                    ticket.ticket_type='single'
+                    ticket.save()
+            if 'round_trip' in x:
+                # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='round')
+                # if not t:
+                    ticket=Ticket()
+                    ticket.travel_entry_id=user
+                    ticket.event_id=data[0]['event_id']
+                    ticket.planner_id=data[0]['planner_id']
+                    ticket.user_id=data[0]['user_id']
+                    
+                    y=x['round_trip']
+                    ticket.passenger_name=y['passenger_name']
+                    ticket.flight_no=y['flight_no']
+                    ticket.source_location=y['source_location']
+                    ticket.departure_date=y['departure_date']
+                    ticket.departure_time=y['departure_time']
+                    ticket.arrival_date=y['arrival_date']
+                    ticket.arrival_time=y['arrival_time']
+                    ticket.arrival_location=y['arrival_location']
+                    ticket.airline_name=y['airline_name']
+                    ticket.ticket_type='round'
+                    ticket.save()
+        return render(request,'main.html',context={"data":'Pushed to database successfully'})
+    
+    except:
+        return render(request, 'main.html',context={"data":"error while pushing"})
 
 
 

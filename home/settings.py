@@ -28,7 +28,8 @@ SECRET_KEY = 'django-insecure-v0zwt049=r5le$c+!j9^qx(*un#-wjqz^a!3hd##vwc$pgqtb5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -79,6 +80,10 @@ WSGI_APPLICATION = 'home.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',  # or any other database backend
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'mysql':{
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
@@ -129,4 +134,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+DATABASE_ROUTERS = ['app.routers.AppDatabaseRouter']
+
 

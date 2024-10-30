@@ -1,26 +1,26 @@
 [
     {
         "single_trip": {
-            "flight_no": "AI 2623",
-            "passenger_name": "Mr. Shaan Malani Adult",
-            "source_location": "Mumbai(T2)",
-            "departure_date": "Sun, 02 Feb 2025",
-            "departure_time": "09:40 hrs",
-            "arrival_date": "Sun, 02 Feb 2025",
-            "arrival_time": "11:10 hrs",
-            "arrival_location": "Udaipur",
-            "airline_name": "Air India"
+            "flight_no": "123",
+            "passenger_name": "Jane Doe",
+            "source_location": "MUC",
+            "departure_date": "22-02-2021",
+            "departure_time": "06:00",
+            "arrival_date": "22-02-2021",
+            "arrival_time": "08:00",
+            "arrival_location": "LHR",
+            "airline_name": "Lufthansa"
         },
         "round_trip": {
-            "flight_no": "AI 2614",
-            "passenger_name": "Mr. Shaan Malani Adult",
-            "source_location": "Udaipur",
-            "departure_date": "Tue, 04 Feb 2025",
-            "departure_time": "14:20 hrs",
-            "arrival_date": "Tue, 04 Feb 2025",
-            "arrival_time": "15:55 hrs",
-            "arrival_location": "Mumbai(T2)",
-            "airline_name": "Air India"
+            "flight_no": "456",
+            "passenger_name": "Jane Doe",
+            "source_location": "LHR",
+            "departure_date": "28-02-2021",
+            "departure_time": "16:00",
+            "arrival_date": "28-02-2021",
+            "arrival_time": "18:00",
+            "arrival_location": "MUC",
+            "airline_name": "Lufthansa"
         }
     }
 ]

@@ -49,7 +49,9 @@ OPENAI_API_KEY = your_api_key
 
 Start the Django development server by running the following command:
 ```bash
-python3 manage.py runserver
+python3 manage.py runserver (For local development)
+python -m waitress --host=0.0.0.0 --port=8000 --threads=4  home.wsgi:application 
+
 ```
 
 ### 6. Access the Application
@@ -62,6 +64,7 @@ or open your server link address in your browser
 
 #### Thank You
 
+ 
 
 
 
