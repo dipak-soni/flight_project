@@ -30,7 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['flight-project-lria.onrender.com', 'localhost', '127.0.0.1']
 
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://flight-project-lria.onrender.com',  # Your Render app
+]
 
 # Application definition
 
