@@ -7,4 +7,5 @@ langchain-community
 langchain-openai
 python-dotenv 
 waitress==2.1.2
+gunicorn
 
