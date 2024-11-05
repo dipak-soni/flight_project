@@ -3,17 +3,16 @@ import os
 from django.http import JsonResponse,FileResponse
 import json
 import fitz 
-from langchain_community.llms import OpenAI,Cohere
 import requests
 import time
-from langchain_openai import OpenAI
 import shutil
 from .image import vision
 import csv
 from django.conf import settings
 from .json_to_csv import get_csv
-from .models import *
-import openai
+from .models import User,Ticket
+from .llm import llm_res
+import re
 from dotenv import load_dotenv 
 load_dotenv()
 
@@ -21,7 +20,7 @@ load_dotenv()
 json_data=[]
 form_data=[]
 
-def llm_response():
+def llm_response(airport_code):
     # get the directory of the files where pdfs and images are stored
     directory= str(os.getcwd()).replace('\\','/')+'/app/files'
     directory_path = directory
@@ -36,9 +35,9 @@ def llm_response():
         # Read the file one by one
         text=save_chunks(file)
         # get respones from llm in json form 
-        response=get_json(text)
+        response=get_json(text,airport_code)
         try:
-            json_data.append(json.loads(response))
+            json_data.append(response)
         except:
             pass
        
@@ -53,46 +52,23 @@ def llm_response():
 
 
 # this function will return the llm response in json format
-def get_json(text):
-    prompt = f"""
-        You are an assistant that returns flight details in JSON format. Based on the document provided below, return the flight details in the following format:
-        
-        {{
-            "single_trip": {{
-                "flight_no": "",
-                "passenger_name":"",
-                "source_location":"",
-                "departure_date":"",
-                "departure_time":"",
-                "arrival_date":"",
-                "arrival_time":"",
-                "arrival_location":"",
-                "airline_name":""
-            }},
-            "round_trip": {{
-                "flight_no": "",
-                "passenger_name":"",
-                "source_location":"",
-                "departure_date":"",
-                "departure_time":"",
-                "arrival_date":"",
-                "arrival_time":"",
-                "arrival_location":"",
-                "airline_name":""
-            }}
-        }}
-        Instructions:
-        1. If you do not get return ticket informations then simply exclude the "round_trip" field from response.
-        2. if single_trip and round_trip are equal then exclude round_trip field.
-        3. In case of multiple flight tickets then take into consider only first and last ticket.
-        Document: {text}
-        
-        Answer:
-    """
-    data=opanai_answer(prompt)
-    # print(data)
-    return data
+def get_json(text,airport_code):
+    data=llm_res(text,airport_code)
+    
+    # Regex pattern to match the JSON data
+    pattern = r'\{.*\}'
 
+    # Search for the JSON part
+    match = re.search(pattern, data, re.DOTALL)
+
+    # Extract the JSON data if a match is found
+    if match:
+        json_d = match.group(0)
+        json_d=json.loads(json_d)
+        return json_d
+    else:
+        print("No JSON data found.")
+        return None
 
 
 # this function reads the text from a PDF or image file and returns the text content as a string
@@ -102,94 +78,23 @@ def save_chunks(file):
         text = ""
         for page in doc:
             text += page.get_text()
+        # if pdf is not selectable
+        if len(text)==0:
+            print("PDF is not selectable.")
+                   
         return text
     elif file.endswith((".png", ".jpg", ".tiff", ".webp", ".jpeg")):
         text = vision(file)  # calling OpenAI Vision API to extract text from images
         return text
     else:
         raise ValueError("Unsupported file format")
-
-
-
-
-def opanai_answer(question):
-    # llm=Cohere()
-    # llm = AnthropicLLM()
-    try:
-        llm=OpenAI()
-        response=llm.invoke(question)
-        return response
-    except:
-        print("open ai error occurred")
-        JsonResponse({"error": "Unable to connect"}, status=500)
    
-
-# def csv_creator(json_data):
-#     csv_file_path='output.csv'
-#     # Get the keys from the first dictionary in the JSON data
-#     keys = json_data[0].keys()
-
-#     # Write to CSV file
-#     with open(csv_file_path, mode='w', newline='', encoding='utf-8') as csv_file:
-#         writer = csv.DictWriter(csv_file, fieldnames=keys)
-#         writer.writeheader()  # Write the header
-#         writer.writerows(json_data)  # Write the data rows
-
-
-
-
-# def show_csv(request):
-           
-#     csv_file_path = os.path.join(settings.BASE_DIR, 'output.csv')  # Specify your CSV file path
-#     single_trip_data = []
-#     round_trip_data = []
-
-#     with open(csv_file_path, mode='r', encoding='utf-8') as file:
-#         csv_reader = csv.reader(file)
-#         header = next(csv_reader)  # Skip header row
-#         for row in csv_reader:
-            
-#             if not row:  # Skip empty rows
-#                 continue
-#             if len(row) < 2:  # Ensure there are at least 2 elements
-#                 continue
-
-#             try:
-#                 single_trip = ast.literal_eval(row[0]) if row[0] else {}
-#                 round_trip = ast.literal_eval(row[1]) if row[1] else {}
-#                 single_trip_data.append(single_trip)
-#                 round_trip_data.append(round_trip)
-#             except (SyntaxError, ValueError) as e:
-#                 print(f"Error parsing row {row}: {e}")  # Optional: log or print error details
-
-#     context = {
-#         'single_trip_data': single_trip_data,
-#         'round_trip_data': round_trip_data,
-#     }
-#     print(context)
-#     return render(request, 'show_csv.html', context)
 
 
 # show csv file to user
 def show_csv(request):
-    directory = os.path.join(settings.BASE_DIR, 'csv_data','')
-      # List all files in the directory
-    files = os.listdir(directory)
-    
-    # Filter files that match the naming pattern
-    csv_files = [f for f in files if f.startswith('flights_data_') and f.endswith('.csv')]
-    
-        # Find the latest number
-    if csv_files:
-        # Extract the numbers from the file names and find the maximum
-        numbers = [int(f.split('_')[2].split('.')[0]) for f in csv_files]
-        next_number = max(numbers) 
-    else:
-        next_number = 1  # If no files, start with 1
-        
-    # Create the new file name
-    csv_file_name = f'flights_data_{next_number}.csv'
-    csv_file_path = os.path.join(directory, csv_file_name)
+    directory = os.path.join(settings.BASE_DIR, 'csv_data')
+    csv_file_path = os.path.join(directory, 'flights_data.csv')
     # Prepare data to display
     csv_data = []
     
@@ -210,23 +115,7 @@ def show_csv(request):
 
 def download_csv(request):
     directory = os.path.join(settings.BASE_DIR, 'csv_data','')
-      # List all files in the directory
-    files = os.listdir(directory)
-    
-    # Filter files that match the naming pattern
-    csv_files = [f for f in files if f.startswith('flights_data_') and f.endswith('.csv')]
-    
-        # Find the latest number
-    if csv_files:
-        # Extract the numbers from the file names and find the maximum
-        numbers = [int(f.split('_')[2].split('.')[0]) for f in csv_files]
-        next_number = max(numbers) 
-    else:
-        next_number = 1  # If no files, start with 1
-        
-    # Create the new file name
-    csv_file_name = f'flights_data_{next_number}.csv'
-    csv_file_path = os.path.join(directory, csv_file_name)
+    csv_file_path = os.path.join(directory, 'flights_data.csv')
     
     # Serve the file as a download
     response = FileResponse(open(csv_file_path, 'rb'), as_attachment=True, filename='flights_data.csv')
@@ -245,12 +134,12 @@ def getFormData(request):
         event_id = request.POST['iEventID']
         planner_id = request.POST['iPlannerID']
         user_id = request.POST['iUserID']
+        airport_code=request.POST['airportCode']
         files = request.FILES.getlist('fileUploads')
         request.session['travel_entry_id'] = travel_entry_id
-        f_data={'travel_entry_id': travel_entry_id, 'event_id': event_id, 'planner_id': planner_id, 'user_id': user_id}
+        f_data={'travel_entry_id': travel_entry_id, 'event_id': event_id, 'planner_id': planner_id, 'user_id': user_id,'airport_code': airport_code}
         form_data.append(f_data)
         # print(form_data)
-    
         # get the path of pdf files and images stored
         upload_dir = os.path.join(os.getcwd(), 'app/files')
         path= upload_dir
@@ -272,7 +161,10 @@ def getFormData(request):
                     destination.write(chunk)
           
         # if file uploaded successfully then call the llm function
-        response= llm_response()
+        try:
+            llm_response(airport_code)
+        except Exception as e:
+            print(e)
         with open('data.json', 'r') as f:
             data = json.load(f)
             data=json.dumps(data)
@@ -293,13 +185,12 @@ def getFormData(request):
         return render(request, 'form.html')
        
 
-
 # push to webhook api
 def push_webhook(request):
     with open('data.json', 'r') as f:
         data = json.load(f)
     data=json.dumps(data)
-    requests.post('https://webhook.site/74fe7401-3802-4d5d-aab7-9112add794e7',data)
+    requests.post(os.getenv('POST_API_URL'),data)
     return render(request,'main.html',context={"data":'pushed to webhook successfully'})
 
 
@@ -307,7 +198,7 @@ def push_webhook(request):
 def database(request):
     # data=[{'travel_entry_id': '123', 'event_id': 'ghgh', 'planner_id': 'gg', 'user_id': 'gg'}]
     data=form_data
-    
+    print(data)
     try:
         user=User.objects.filter(travel_entry_id=data[0]['travel_entry_id'])
         if not user:
@@ -327,6 +218,7 @@ def database(request):
                     ticket.event_id=data[0]['event_id']
                     ticket.planner_id=data[0]['planner_id']
                     ticket.user_id=data[0]['user_id']
+                    ticket.airport_code=data[0]['airport_code']
                     
                     y=x['single_trip']
                     ticket.passenger_name=y['passenger_name']
@@ -348,6 +240,7 @@ def database(request):
                     ticket.event_id=data[0]['event_id']
                     ticket.planner_id=data[0]['planner_id']
                     ticket.user_id=data[0]['user_id']
+                    ticket.airport_code=data[0]['airport_code']
                     
                     y=x['round_trip']
                     ticket.passenger_name=y['passenger_name']
@@ -363,7 +256,8 @@ def database(request):
                     ticket.save()
         return render(request,'main.html',context={"data":'Pushed to database successfully'})
     
-    except:
+    except Exception as e:
+        print(e)
         return render(request, 'main.html',context={"data":"error while pushing"})
 
 

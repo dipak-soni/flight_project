@@ -37,11 +37,6 @@ def vision(file):
         ],
     )
 
-    # Returning the model's response
 
-    return response.choices[0]
+    return response.choices[0].message.content
 
-# # Example usage
-# file_path = "/home/raghav/Downloads/15_flight_project/home/app/files/Screenshot from 2024-10-22 17-26-03.png"
-# result = vision(file_path)
-# print(result)

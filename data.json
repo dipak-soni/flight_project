@@ -1,26 +1,26 @@
 [
     {
         "single_trip": {
-            "flight_no": "123",
-            "passenger_name": "Jane Doe",
-            "source_location": "MUC",
-            "departure_date": "22-02-2021",
-            "departure_time": "06:00",
-            "arrival_date": "22-02-2021",
-            "arrival_time": "08:00",
-            "arrival_location": "LHR",
-            "airline_name": "Lufthansa"
+            "flight_no": "MH195",
+            "passenger_name": "Malani Shaan Mr",
+            "source_location": "Mumbai",
+            "departure_date": "24JUN2024",
+            "departure_time": "23:25",
+            "arrival_date": "25JUN2024",
+            "arrival_time": "07:25",
+            "arrival_location": "Kuala Lumpur",
+            "airline_name": "Malaysia Airlines"
         },
         "round_trip": {
-            "flight_no": "456",
-            "passenger_name": "Jane Doe",
-            "source_location": "LHR",
-            "departure_date": "28-02-2021",
-            "departure_time": "16:00",
-            "arrival_date": "28-02-2021",
-            "arrival_time": "18:00",
-            "arrival_location": "MUC",
-            "airline_name": "Lufthansa"
+            "flight_no": "MH194",
+            "passenger_name": "Malani Shaan Mr",
+            "source_location": "Kuala Lumpur",
+            "departure_date": "30JUN2024",
+            "departure_time": "19:35",
+            "arrival_date": "30JUN2024",
+            "arrival_time": "22:15",
+            "arrival_location": "Mumbai",
+            "airline_name": "Malaysia Airlines"
         }
     }
 ]

@@ -2,6 +2,7 @@ import json
 import csv
 import os
 from django.conf import settings
+import shutil
 
 def get_csv():
 # Step 1: Load the JSON data from the file
@@ -22,24 +23,17 @@ def get_csv():
                     ,'return arrival_location'
                     ,'return airline_name' 
         ]
-        csv_directory=os.path.join(settings.BASE_DIR,'csv_data','')
+        csv_directory=os.path.join(settings.BASE_DIR,'csv_data')
+        path= csv_directory
         
-         # List all files in the directory
-        files = os.listdir(csv_directory)
-        
-        # Filter files that match the naming pattern
-        csv_files = [f for f in files if f.startswith('flights_data_') and f.endswith('.csv')]
-        
-         # Find the latest number
-        if csv_files:
-            # Extract the numbers from the file names and find the maximum
-            numbers = [int(f.split('_')[2].split('.')[0]) for f in csv_files]
-            next_number = max(numbers) + 1
-        else:
-            next_number = 1  # If no files, start with 1
+        # remove the existing files in the directory before uploading new ones
+        shutil.rmtree(path) 
+        # Create the directory that was deleted before
+        if not os.path.exists(csv_directory):
+            os.makedirs(csv_directory)
             
         # Create the new file name
-        csv_file_name = f'flights_data_{next_number}.csv'
+        csv_file_name = 'flights_data.csv'
         csv_file_path = os.path.join(csv_directory, csv_file_name)
         
         # Step 3: Create the CSV file and write the data
