@@ -11,12 +11,19 @@ def get_csv():
             data = json.load(json_file)
 
         # Step 2: Define the CSV headers (for both single_trip and round_trip)
-        csv_headers = [ 'flight_no','passenger name', 'departure_date', 'departure_time' ,'arrival_date'
+        csv_headers = [ 
+                    'flight_no'
+                    ,'passenger name'
+                    ,'source_location'
+                    ,'departure_date'
+                    ,'departure_time'
+                    ,'arrival_date'
                     ,'arrival_time'
                     ,'arrival_location'
                     ,'airline_name'
                     ,'return flight_no'
                     ,'return departure_date'
+                    , 'return source_location'
                     ,'return departure_time'
                     ,'return arrival_date'
                     ,'return arrival_time'
@@ -51,6 +58,7 @@ def get_csv():
                 writer.writerow({
                     'flight_no': single_trip.get('flight_no', ''),
                     'passenger name':single_trip.get('passenger_name', ''),
+                    'source_location':single_trip.get('source_location', ''),
                     'departure_date': single_trip.get('departure_date', ''),
                     'departure_time': single_trip.get('departure_time', ''),
                     'arrival_date': single_trip.get('arrival_date', ''),
@@ -58,6 +66,7 @@ def get_csv():
                     'arrival_location': single_trip.get('arrival_location', ''),
                     'airline_name': single_trip.get('airline_name', ''),
                     'return flight_no': round_trip.get('flight_no', ''),
+                    'return source_location': round_trip.get('source_location', ''),
                     'return departure_date': round_trip.get('departure_date', ''),
                     'return departure_time': round_trip.get('departure_time', ''),
                     'return arrival_date': round_trip.get('arrival_date', ''),

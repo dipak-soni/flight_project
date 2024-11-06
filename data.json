@@ -3,23 +3,23 @@
         "single_trip": {
             "flight_no": "MH715",
             "passenger_name": "Malani Shaan Mr",
-            "source_location": "Kuala Lumpur",
+            "source_location": "Denpasar",
             "departure_date": "25JUN2024",
             "departure_time": "09:00",
             "arrival_date": "25JUN2024",
             "arrival_time": "12:05",
-            "arrival_location": "Denpasar-Bali Ngurah Rai",
+            "arrival_location": "Kuala Lumpur",
             "airline_name": "Malaysia Airlines"
         },
         "round_trip": {
             "flight_no": "MH714",
             "passenger_name": "Malani Shaan Mr",
-            "source_location": "Denpasar-Bali Ngurah Rai",
+            "source_location": "Kuala Lumpur",
             "departure_date": "30JUN2024",
             "departure_time": "12:55",
             "arrival_date": "30JUN2024",
             "arrival_time": "16:00",
-            "arrival_location": "Kuala Lumpur",
+            "arrival_location": "Denpasar",
             "airline_name": "Malaysia Airlines"
         }
     }

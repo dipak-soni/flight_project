@@ -1,2 +1,2 @@
-flight_no,passenger name,departure_date,departure_time,arrival_date,arrival_time,arrival_location,airline_name,return flight_no,return departure_date,return departure_time,return arrival_date,return arrival_time,return arrival_location,return airline_name
-MH715,Malani Shaan Mr,25JUN2024,09:00,25JUN2024,12:05,Denpasar-Bali Ngurah Rai,Malaysia Airlines,MH714,30JUN2024,12:55,30JUN2024,16:00,Kuala Lumpur,Malaysia Airlines
+flight_no,passenger name,source_location,departure_date,departure_time,arrival_date,arrival_time,arrival_location,airline_name,return flight_no,return departure_date,return source_location,return departure_time,return arrival_date,return arrival_time,return arrival_location,return airline_name
+MH715,Malani Shaan Mr,Denpasar,25JUN2024,09:00,25JUN2024,12:05,Kuala Lumpur,Malaysia Airlines,MH714,30JUN2024,Kuala Lumpur,12:55,30JUN2024,16:00,Denpasar,Malaysia Airlines
