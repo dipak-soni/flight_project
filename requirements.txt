@@ -10,3 +10,4 @@ waitress==2.1.2
 gunicorn
 pdf2image
 mysqlclient
+djangorestframework
