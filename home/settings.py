@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -163,5 +164,13 @@ LOGGING = {
             'propagate': True,
         },
     },
+}
+
+
+REST_FRAMEWORK = {
+     'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',          # For JSON responses
+        # 'rest_framework.renderers.BrowsableAPIRenderer',  # Browsable API
+    ],
 }
 

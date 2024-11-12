@@ -13,6 +13,11 @@ from .json_to_csv import get_csv
 from .models import User,Ticket
 from .llm import llm_res
 import re
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import TravelEntrySerializer
 from dotenv import load_dotenv 
 load_dotenv()
 
@@ -230,7 +235,7 @@ def database(request):
                     ticket.arrival_time=y['arrival_time']
                     ticket.arrival_location=y['arrival_location']
                     ticket.airline_name=y['airline_name']
-                    ticket.ticket_type='single'
+                    ticket.ticket_type='arrival'
                     ticket.save()
             if 'round_trip' in x:
                 # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='round')
@@ -252,7 +257,7 @@ def database(request):
                     ticket.arrival_time=y['arrival_time']
                     ticket.arrival_location=y['arrival_location']
                     ticket.airline_name=y['airline_name']
-                    ticket.ticket_type='round'
+                    ticket.ticket_type='departure'
                     ticket.save()
         return render(request,'main.html',context={"data":'Pushed to database successfully'})
     
@@ -262,6 +267,103 @@ def database(request):
 
 
 
+class getData(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = TravelEntrySerializer(data=request.data)
+        if serializer.is_valid():
+            # Access validated data if needed
+            travel_entry_id = serializer.validated_data['travel_entry_id']
+            user_id = serializer.validated_data['user_id']
+            event_id = serializer.validated_data['event_id']
+            planner_id = serializer.validated_data['planner_id']
+            airport_code = serializer.validated_data['airport_code']
+            files = serializer.validated_data.get('files', [])
+            print(travel_entry_id,user_id,event_id,planner_id,airport_code,files)
+            
+            upload_dir = os.path.join(os.getcwd(), 'app/files')
+            path= upload_dir
+            
+            # remove the existing files in the directory before uploading new ones
+            shutil.rmtree(path)
+            
+            # Create the directory that was deleted before
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+            
+        
+            # get file from form upload and write to the directory
+            for file in files:
+                file_path = os.path.join(upload_dir, file.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+            try:
+                llm_response(airport_code)
+                user=User.objects.filter(travel_entry_id=travel_entry_id)
+                if not user:
+                    user=User()
+                    user.travel_entry_id=travel_entry_id
+                    user.save()  
+                user=User.objects.get(travel_entry_id=travel_entry_id)
+
+                with open('data.json', 'r') as f:
+                    file_dta = json.load(f)
+                for x in file_dta:
+                    if 'single_trip' in x:
+                        # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='single')
+                        # if not t:
+                            ticket=Ticket()
+                            ticket.travel_entry_id=user
+                            ticket.event_id=event_id
+                            ticket.planner_id=planner_id
+                            ticket.user_id=user_id
+                            ticket.airport_code=airport_code
+                            
+                            y=x['single_trip']
+                            ticket.passenger_name=y['passenger_name']
+                            ticket.flight_no=y['flight_no']
+                            ticket.source_location=y['source_location']
+                            ticket.departure_date=y['departure_date']
+                            ticket.departure_time=y['departure_time']
+                            ticket.arrival_date=y['arrival_date']
+                            ticket.arrival_time=y['arrival_time']
+                            ticket.arrival_location=y['arrival_location']
+                            ticket.airline_name=y['airline_name']
+                            ticket.ticket_type='arrival'
+                            ticket.save()
+                    if 'round_trip' in x:
+                        # t=Ticket.objects.filter(event_id=data[0]['event_id'], ticket_type='round')
+                        # if not t:
+                            ticket=Ticket()
+                            ticket.travel_entry_id=user
+                            ticket.event_id=event_id
+                            ticket.planner_id=planner_id
+                            ticket.user_id=user_id
+                            ticket.airport_code=airport_code
+                            
+                            y=x['round_trip']
+                            ticket.passenger_name=y['passenger_name']
+                            ticket.flight_no=y['flight_no']
+                            ticket.source_location=y['source_location']
+                            ticket.departure_date=y['departure_date']
+                            ticket.departure_time=y['departure_time']
+                            ticket.arrival_date=y['arrival_date']
+                            ticket.arrival_time=y['arrival_time']
+                            ticket.arrival_location=y['arrival_location']
+                            ticket.airline_name=y['airline_name']
+                            ticket.ticket_type='departure'
+                            ticket.save()
+       
+                global json_data
+                json_data=[]
+            except Exception as e:
+                print(e)
+            with open('data.json', 'r') as f:
+                data = json.load(f)
+
+            
+            return Response({"data": data}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
  
 
 

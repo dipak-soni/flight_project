@@ -8,4 +8,5 @@ urlpatterns = [
     path('getFormData/',getFormData,name='getFormData'),
     path('push_webhook/',push_webhook,name='push_webhook'),
     path('db/',database,name='database'),
+    path('getdata/', getData.as_view(), name='get-data'),
 ]
