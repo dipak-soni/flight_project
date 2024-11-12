@@ -358,6 +358,7 @@ class getData(APIView):
                 json_data=[]
             except Exception as e:
                 print(e)
+                return Response({"data": "Network Error"},status=status.HTTP_400_BAD_REQUEST)
             with open('data.json', 'r') as f:
                 data = json.load(f)
 

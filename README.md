@@ -78,6 +78,23 @@ python -m waitress --host=0.0.0.0 --port=8000 --threads=4 home.wsgi:application
 
 waitress-serve --host=0.0.0.0 --port=8000 --thresds=4 home.wsgi:application  (If first one does not work)
 ```
+
+### 7. Access API 
+
+To receive a JSON response from the server, use the following API endpoint:
+
+Endpoint: http://127.0.0.1:8000/getdata/
+
+Request Body (JSON format):
+{
+  "trave_entry_id": ,
+  "user_id":"",
+  "planner_id":"",
+  "event_id":"",
+  "airport_code":"",
+  "files":[]       
+}
+
 ### 7. Access the Application
 
 Local development: Open your browser and go to http://127.0.0.1:8000.
